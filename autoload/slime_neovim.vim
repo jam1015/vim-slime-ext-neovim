@@ -7,8 +7,9 @@ function! slime_neovim#config(config)
   if exists("g:slime_get_jobid")
     let a:config["neovim"]["jobid"] = g:slime_get_jobid()
   else
-    let a:config["neovim"]["jobid"] = input("jobid: ", b:slime_config["jobid"])
+    let a:config["neovim"]["jobid"] = input("jobid: ", a:config["neovim"]["jobid"])
   end
+  return a:config
 endfunction
 
 function! slime_neovim#send(config, text)
