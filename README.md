@@ -13,3 +13,6 @@ An experiment for an external neovim plugin for vim-slime
   }
 ```
 
+## Keeps Track of Multiple Terminals
+
+When you close a terminal, the next time you try to send text the plugin will try to use a different open terminal.
