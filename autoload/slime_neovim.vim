@@ -26,7 +26,7 @@ function! slime_neovim#config(config, ...)
     endif
     let config_in["neovim"]["jobid"] = id_in
     if s:NotValidConfig(config_in)
-        throw "Channel identity not valid."
+        throw "Channel id not valid."
     endif
     return config_in
 endfunction
