@@ -1,35 +1,34 @@
 " Public API for vim-slime to use.
+
 function! slime_neovim#config(config, ...)
-	" checks if valid config exists and then tries to send text to terminal
-	"debug echo "in slime_neovim#config"
-	"debug echo "trying to config"
-
-
-	let config_in = a:config
-
-	if s:NotExistsLastChannel()
-		throw "Terminal not detected."
-	endif
-
-	if s:NotValidConfig(config_in)
-		let config_in = {}
-		let config_in["neovim"]= {"jobid": str2nr(get(g:slime_last_channel, -1, ""))}
-	endif
-
-	if exists("g:slime_get_jobid")
-		let config_in["neovim"]["jobid"] = g:slime_get_jobid()
-	else
-		let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
-		let id_in = str2nr(id_in)
-		let config_in["neovim"]["jobid"] = id_in
-	endif
-
-
-	if s:NotValidConfig(config_in)
-		throw "Channel identity not valid."
-	endif
-
-	return config_in
+    let config_in = a:config
+    if s:NotExistsLastChannel()
+        throw "Terminal not detected."
+    endif
+    if s:NotValidConfig(config_in)
+        let config_in = {}
+        let config_in["neovim"]= {"jobid": str2nr(get(g:slime_last_channel, -1, "")['jobid'])}
+    endif
+    let id_in = 0
+    if get(g:, "slime_input_pid", 0)
+        let pid_in = input("pid: ", str2nr(config_in["neovim"]["jobid"]))
+        let id_in = slime_neovim#translate_pid_to_id(pid_in)
+    else
+        if exists("g:slime_get_jobid")
+            let id_in = g:slime_get_jobid()
+        else
+            let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
+            let id_in = str2nr(id_in)
+        endif
+    endif
+    if id_in == -1
+        throw "No matching job id for the provided pid."
+    endif
+    let config_in["neovim"]["jobid"] = id_in
+    if s:NotValidConfig(config_in)
+        throw "Channel identity not valid."
+    endif
+    return config_in
 endfunction
 
 
@@ -68,17 +67,23 @@ function slime_neovim#SlimeAddChannel()
 	endif
 endfunction
 
+
+function! slime_neovim#SlimeAddChannel()
+    if !exists("g:slime_last_channel")
+        let g:slime_last_channel = [{'jobid': &channel, 'pid': b:terminal_job_pid}]
+    else
+        call add(g:slime_last_channel, {'jobid': &channel, 'pid': b:terminal_job_pid})
+    endif
+endfunction
+
 function slime_neovim#SlimeClearChannel() 
-	" checks if slime_last_channel exists and is nonempty; then filter slime_last_channel to only have existing channels
-	if !exists("g:slime_last_channel")
-	elseif len(g:slime_last_channel) == 1
-		unlet g:slime_last_channel
-	else
-		let bufinfo = getbufinfo()
-		call filter(bufinfo, {_, val -> has_key(val['variables'], "terminal_job_id") })
-		call map(bufinfo, {_, val -> val["variables"]["terminal_job_id"] })
-		call filter(g:slime_last_channel, {_, val -> index(bufinfo, val ) >= 0 })
-	endif
+    if !exists("g:slime_last_channel")
+        return
+    endif
+    let bufinfo = getbufinfo()
+    call filter(bufinfo, {_, val -> has_key(val['variables'], "terminal_job_id") && has_key(val['variables'], "terminal_job_pid")})
+    let id_list = map(copy(g:slime_last_channel), {_, val -> val["jobid"]})
+    call filter(g:slime_last_channel, {_, val -> index(id_list, val["jobid"]) >= 0})
 endfunction
 
 function! slime_neovim#send(config, text)
@@ -94,7 +99,7 @@ function! slime_neovim#send(config, text)
 		catch /Terminal not detected./
 			echo "Terminal not detected: Open a neovim terminal and try again. "
 			return
-		catch /Channel identity not valid./
+		catch /Channel id not valid./
 			echo "Channel id not valid: Open a neovim terminal and try again. "
 			return
 		finally
@@ -102,6 +107,16 @@ function! slime_neovim#send(config, text)
 	endif
 
 	call chansend(str2nr(config_in["neovim"]["jobid"]), split(a:text, "\n", 1))
+endfunction
+
+
+function! slime_neovim#translate_pid_to_id(pid)
+    for ch in g:slime_last_channel
+        if ch['pid'] == a:pid
+            return ch['jobid']
+        endif
+    endfor
+    return -1
 endfunction
 
 function! s:NotExistsLastChannel() abort "
