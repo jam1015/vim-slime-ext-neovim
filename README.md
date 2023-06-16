@@ -2,6 +2,7 @@
 
 A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, enhancing your development workflow. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
 
+
 ## Example of installation and configuration using lazy.nvim
 
 ### Lua installation Configuration
@@ -14,7 +15,7 @@ config = function()
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
 
-	-- allows use of pid rather than internal job_id for config see note below this codeblock
+	-- allows use of PID rather than internal job_id for config see note below this codeblock
 	vim.g.slime_input_pid = 1
 
 	-- optional but useful keymaps:
@@ -31,7 +32,7 @@ end
 
 #### Note on `g:slime_input_pid`
 
-Used to send text using the external pid rather than Neovim's internal job id. Setting this to a nonzero value (evaluated as `true` in vimscript), as is done here, is recommended because the pid is the number displayed on the status line of a terminal buffer, making it easier to select the desired terminal. This recommended setting is not the default because neovim  uses it's internal job id to send text to a terminal; the plugin has a function that translates the pid to the inernal job id.
+Used to send text using the external PID rather than Neovim's internal job id. Setting this to a nonzero value (evaluated as `true` in vimscript), as is done here, is recommended because the PID is the number displayed on the status line of a terminal buffer, making it easier to select the desired terminal. This recommended setting is not the default because neovim  uses it's internal job id to send text to a terminal; the plugin has a function that translates the PID to the inernal job id.
 
 ##### Side Note
 
@@ -43,7 +44,7 @@ Recall that when configuring neovim in lua, variables in the global `g:` namespa
 let g:slime_target_send = "slime_neovim#send"
 let g:slime_target_config = "slime_neovim#config"
 
-" Use external pid instead of Neovim's internal job id
+" Use external PID instead of Neovim's internal job id
 let g:slime_input_pid = 1
 
 " Key mappings:
@@ -90,5 +91,13 @@ It does this using the `g:slime_last_channel` variable which is an array of vims
 ### Can Use PID or internal job id for configuration
 
 Under the hood Neovim sends text to a running a terminal using the `terminal_job_id`, which are typically low numbers.  Neovim also keeps track of the `terminal_job_pid` which is the system's identifier, and importantly *is displayed on the status line of the terinal buffer*. The default settings are that the user if prompted with a `terminal_job_id` value, because this is what is used by neovim internally to send text to a terminal.  However, because it is readily displayed for each running terminal, `terminal_job_pid` is much easier to manually configure, and that is why `vim.g.slime_input_pid=1` is included in the example configuration (the vimscript equivalent of this is `let g:slime_input_pid=1`.
+
+
+## Glossary
+
+- `PID`: In Linux, PID stands for "Process IDentifier". A PID is a unique number that is automatically assigned to each process when it is created on a Unix-like operating system. A process is an executing (i.e., running) instance of a program. Applies to Macos as well. Represented as `terminal_job_pid` in under the `variables` field of the `getbufinfo()` Neovim vimscript command.
+
+
+- `job id`: the internal identifier that Neovim attaches to a running terminal process. `termnal_job_id` is the corresponding field in the `variables` section of `getbufinfo()`.
 
 
