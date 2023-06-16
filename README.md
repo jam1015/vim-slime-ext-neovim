@@ -8,33 +8,34 @@ A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, 
 
 ```lua
 {
-	'Klafyvel/vim-slime-ext-neovim',
-	dependencies = { "jpalardy/vim-slime-ext-plugins" },
-	config = function()
-		vim.g.slime_target_send = "slime_neovim#send"
-		vim.g.slime_target_config = "slime_neovim#config"
+'Klafyvel/vim-slime-ext-neovim',
+dependencies = { "jpalardy/vim-slime-ext-plugins" },
+config = function()
+	vim.g.slime_target_send = "slime_neovim#send"
+	vim.g.slime_target_config = "slime_neovim#config"
 
-		-- allows use of pid rather than internal job_id for config see note below this codeblock
-		vim.g.slime_input_pid = 1
+	-- allows use of pid rather than internal job_id for config see note below this codeblock
+	vim.g.slime_input_pid = 1
 
-		-- optional but useful keymaps:
-		---- send text using gz as operator before motion or text object
-		vim.keymap.set("n", "gz", "<Plug>SlimeMotionSend", { remap = true })
-		---- send line of text
-		vim.keymap.set("n", "gzz", "<Plug>SlimeLineSend", { remap = true })
-		---- send visual selection
-		vim.keymap.set("x", "gz", "<Plug>SlimeRegionSend", { remap = true })
-	end
+	-- optional but useful keymaps:
+	---- send text using gz as operator before motion or text object
+	vim.keymap.set("n", "gz", "<Plug>SlimeMotionSend", { remap = true })
+	---- send line of text
+	vim.keymap.set("n", "gzz", "<Plug>SlimeLineSend", { remap = true })
+	---- send visual selection
+	vim.keymap.set("x", "gz", "<Plug>SlimeRegionSend", { remap = true })
+end
 }
 
 ```
 
 #### Note on `g:slime_input_pid`
 
-Sid note: Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
-
 Used to send text using the external pid rather than Neovim's internal job id. Setting this to a nonzero value (evaluated as `true` in vimscript), as is done here, is recommended because the pid is the number displayed on the status line of a terminal buffer, making it easier to select the desired terminal. This recommended setting is not the default because neovim  uses it's internal job id to send text to a terminal; the plugin has a function that translates the pid to the inernal job id.
 
+##### Side Note
+
+Side note: Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
 
 ### vimscript configuration
 
