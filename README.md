@@ -35,7 +35,7 @@ Used to send text using the external pid rather than Neovim's internal job id. S
 
 ##### Side Note
 
-Side note: Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
+Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
 
 ### vimscript configuration
 
