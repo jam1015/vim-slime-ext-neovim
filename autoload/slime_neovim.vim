@@ -1,9 +1,14 @@
 " Public API for vim-slime to use.
 
 function! slime_neovim#config(config, ...)
+	let internal = a:0 > 0 && a:1 == "internal" "testing if we called the function internally, or if slime_neovim_ext_plugins called it
 	let config_in = a:config
 	if s:NotExistsLastChannel()
-		throw "Terminal not detected."
+		if internal
+			throw "Terminal not detected."
+		else
+			return {}
+		endif
 	endif
 	if s:NotValidConfig(config_in)
 		let config_in = {}
@@ -22,11 +27,19 @@ function! slime_neovim#config(config, ...)
 		endif
 	endif
 	if id_in == -1
-		throw "No matching job id for the provided pid."
+		if internal
+			throw "No matching job id for the provided pid."
+		else
+			return {}
+		endif
 	endif
 	let config_in["neovim"]["jobid"] = id_in
 	if s:NotValidConfig(config_in)
-		throw "Channel id not valid."
+		if internal
+			throw "Channel id not valid."
+		else
+			return {}
+		endif
 	endif
 	return config_in
 endfunction
@@ -94,9 +107,12 @@ function! slime_neovim#send(config, text)
 	if not_valid
 
 		try
-			let b:slime_config = slime_neovim#config(config_in)
+			let b:slime_config = slime_neovim#config(config_in, "internal")
 			let config_in = b:slime_config
 
+		catch /No matching job id for the provided pid/
+			echo "No matching job id for the provided pid.  Try again. "
+			return
 		catch /Terminal not detected./
 			echo "Terminal not detected: Open a neovim terminal and try again. "
 			return
