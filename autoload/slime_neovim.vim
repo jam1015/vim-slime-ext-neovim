@@ -68,16 +68,6 @@ function! s:NotValidConfig(config) abort
 
 endfunction
 
-function slime_neovim#SlimeAddChannel()
-
-	"adds terminal job id to the g:slime_last_channel variable
-	if !exists("g:slime_last_channel")
-		let g:slime_last_channel = [&channel]
-	else
-		call add(g:slime_last_channel, &channel)
-	endif
-endfunction
-
 
 function! slime_neovim#SlimeAddChannel()
 	if !exists("g:slime_last_channel")
