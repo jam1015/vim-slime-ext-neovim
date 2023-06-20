@@ -3,9 +3,7 @@
 A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, enhancing your development workflow. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
 
 
-## Example of installation and configuration using lazy.nvim
-
-### Lua installation Configuration
+## Example of Installation and Configuration Using lazy.nvim
 
 ```lua
 {
@@ -30,15 +28,15 @@ end
 
 ```
 
-#### Note on `g:slime_input_pid`
+### Note on `g:slime_input_pid`
 
 Used to send text using the external PID rather than Neovim's internal job id. Setting this to a nonzero value (evaluated as `true` in vimscript), as is done here, is recommended because the PID is the number displayed on the status line of a terminal buffer, making it easier to select the desired terminal. This recommended setting is not the default because neovim  uses it's internal job id to send text to a terminal; the plugin has a function that translates the PID to the inernal job id.
 
-##### Side Note
+##### Additional Note
 
 Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
 
-### vimscript configuration
+## Vimscript, Configuration Only
 
 ```vim
 let g:slime_target_send = "slime_neovim#send"
@@ -59,15 +57,18 @@ xmap gz <Plug>SlimeRegionSend
 
 
 ## What This Is
+
 Say you are writing code in, for example, python. One way of quickly testing code is to have a terminal where you repeatedly source commands from the terminal.  For example if your file is `hello.py` you might have an editor open in one window, and a shell open in another where you input `python hello.py` after you save changes.  Another way might be to copy and paste your code to an open python session in the terminal.
 
 The [vim-slime](https://github.com/jpalardy/vim-slime) plugin allows the user to set keybindings to send text directly from a Vim or Neovim buffer to a running shell or window. Configuration code for each target is included in that repository.
 
-[vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/) in contrast provides infrastructure for sending text to a target, and leaves the community to develop plugins for each target.  This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal.
+[vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/) in contrast provides infrastructure for sending text to a target, and leaves the community to develop plugins for each target.  
+
+This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal.
 
 ## How to Use
 
-See `:h vim-slime.txt` for default keybindings to send text to a target. I repeat the suggested keymappings from the config section above:
+See `:h slime.txt` for default keybindings to send text to a target. I repeat the suggested additional keymappings from the config section above:
 
 - `gz[operator/motion]`: send text using an operator or motion.
 - In visual mode `gz` can send visually selected text to the target.
@@ -76,6 +77,8 @@ See `:h vim-slime.txt` for default keybindings to send text to a target. I repea
 Of course these are optional and you can do what you want.
 
 When you use one of these motions, the plugin will try to find the most recently opened terminal and select it as the target. You are prompted with the identification number (`terminal_job_id`) or (`terminal_job_pid` if `g:sline_input_pid` is set to a nonzero value).  `terminal_job_pid` is easier to use because that number is displayed on the status line of each terminal buffer. `terminal_job_id` is used by default because that is that Neovim internally uses to send text to the terminals.
+
+If no terminals are open you will be prompted to do so. To do so, open a new split with `<C-w>s` or `<C-w>v` and then enter the command `:terminal`.
 
 Call the `:SlimeConfig` function from an open buffer to reconfigure the terminal connection of that buffer.
 
