@@ -1,9 +1,11 @@
 " autocmds to keep of terminal identification numbers whenever a terminal is opened or closed
 function! s:SetStatusline()
-	if exists("g:ruled_terminal") && g:ruled_terminal
-		setlocal statusline=%{bufname()}%=%-14.(%l,%c%V%)\ %P\ \|\ id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
-	else
-		setlocal statusline=%{bufname()}%=id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
+	if exists("g:override_status") && g:override_status
+		if exists("g:ruled_terminal") && g:ruled_terminal
+			setlocal statusline=%{bufname()}%=%-14.(%l,%c%V%)\ %P\ \|\ id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
+		else
+			setlocal statusline=%{bufname()}%=id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
+		endif
 	endif
 endfunction
 

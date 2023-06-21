@@ -21,16 +21,20 @@ dependencies = { "jpalardy/vim-slime-ext-plugins" },
 
 
 config = function()
-	==setting the 
+
+    --	setting the functions used to send text to the ones defined in this plugin; required by vim-slime-ext-plugins
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
     -- recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
     vim.opt.laststatus = 2
 
 	-- allows use of PID rather than internal job_id for config see note below this codeblock
-	vim.g.slime_input_pid = 1
+	vim.g.slime_input_pid = 0
 
-    -- this plugin overrieds the terminal status line to show the terminals job id and pid on the right side
+    -- override status bar of terminal to show pid and job id
+    vim.g.override_status = 1
+
+    -- show position info as the `ruler` setting does
     vim.g.ruled_terminal = 0
     -- 
 
@@ -44,11 +48,12 @@ config = function()
 end
 }
 
+
 ```
 
 ### Note on `g:slime_input_pid`
 
-Used to send text using the external PID rather than Neovim's internal job id. Set based on preference. **Note that this plugin overrides the default terminal status line** to show the pid and job id clearly, on the far right, whereas the default setting only includes the pid in the name of the buffer. This will facilitate use of either the job id or job pid.
+Used to send text using the external PID rather than Neovim's internal job id. Set based on preference. **Note that this plugin has the option to override the default terminal status line using the g:override_status option** to show the pid and job id clearly, on the far right, whereas the default setting only includes the pid in the name of the buffer. This will facilitate use of either the job id or job pid.
 
 ##### Additional Note
 
@@ -57,6 +62,7 @@ Recall that when configuring neovim in lua, variables in the global `g:` namespa
 ## Vimscript, Configuration Only
 
 ```vim
+"   setting the functions used to send text to the ones defined in this plugin; required by vim-slime-ext-plugins
 let g:slime_target_send = "slime_neovim#send"
 let g:slime_target_config = "slime_neovim#config"
 
@@ -64,6 +70,10 @@ let g:slime_target_config = "slime_neovim#config"
 set laststatus=2
 " Use external PID instead of Neovim's internal job id
 let g:slime_input_pid=0
+
+" override status bar of terminal to show pid and job id
+let g:override_status=1
+
 " show ruler informaton
 let g:ruled_terminal=0
 
@@ -89,7 +99,7 @@ Of course these are optional and you can do what you want.
 
 When you use one of these motions, the plugin will try to find the most recently opened terminal and select it as the target. You are prompted with the identification number (`terminal_job_id`) or (`terminal_job_pid` if `g:sline_input_pid` is set to a nonzero value).  `terminal_job_id` is used by default because that is that Neovim internally uses to send text to the terminals.
 
-This plugin overrides the terminal status bar to show both the `terminal_job_id` and `terminal_job_pid` on the right, whereas without the terminal the `terminal_job_pid` is just included in the buffer name on the left. Recall that `laststatus` should be set to `2` to see a status bar in each window.
+This plugin has the option (by setting `g:override_status` to a nonzero value) to override the terminal status bar to show both the `terminal_job_id` and `terminal_job_pid` on the right, whereas without the override the `terminal_job_pid` is just included in the buffer name on the left. Recall that `laststatus` should be set to `2` to see a status bar in each window.
 
 
 If no terminals are open when you try to send text to one you will be prompted to do so. To do so, open a new split with `<C-w>s` or `<C-w>v` and then enter the command `:terminal` (built into neovim, just a reminder of how to do it).
@@ -109,9 +119,9 @@ It does this using the `g:slime_last_channel` variable which is an array of vims
 
 Under the hood Neovim sends text to a running a terminal using the `terminal_job_id`, which are typically low numbers.  Neovim also keeps track of the `terminal_job_pid` which is the system's identifier, and importantly *is displayed on the status line of the terinal buffer*. The default settings are that the user if prompted with a `terminal_job_id` value, because this is what is used by neovim internally to send text to a terminal.  However, because it is readily displayed for each running terminal, `terminal_job_pid` is much easier to manually configure, and that is why `vim.g.slime_input_pid=1` is included in the example configuration (the vimscript equivalent of this is `let g:slime_input_pid=1`.
 
-### Overrides Status Bar of Terminal Buffers
+### Can Override Status Bar of Terminal Buffers
 
-To show `terminal_job_id` and `terminal_job_pid` on bottom right. See configuration for `g:ruled_terminal` setting, which will turn on or off cursor position information.  The status line override basically turns off the `ruler` setting unless `g:ruled_terminal` is nonzero, in which case the basic `ruler` position information is included.  Custom `ruler` formats are not supported.
+To show `terminal_job_id` and `terminal_job_pid` on bottom right, set the `g:override_status` variable to a nonzero value. See configuration for `g:ruled_terminal` setting, which will turn on or off cursor position information.  The status line override basically turns off the `ruler` setting unless `g:ruled_terminal` is nonzero, in which case the basic `ruler` position information is included.  Custom `ruler` formats are not supported.
 
 ## Glossary
 
