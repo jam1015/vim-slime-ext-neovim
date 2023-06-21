@@ -19,13 +19,11 @@ This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal, all
 'Klafyvel/vim-slime-ext-neovim',
 dependencies = { "jpalardy/vim-slime-ext-plugins" },
 
-init = function() -- It is good practice to set g: variavbles in in the init function; set before plugin is loaded
-	vim.g.slime_target_send = "slime_neovim#send"
-	vim.g.slime_target_config = "slime_neovim#config"
-end,
 
 config = function()
 
+	vim.g.slime_target_send = "slime_neovim#send"
+	vim.g.slime_target_config = "slime_neovim#config"
     -- recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
     vim.opt.laststatus = 2
 
