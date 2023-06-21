@@ -79,7 +79,7 @@ xmap gz <Plug>SlimeRegionSend
 
 ## How to Use
 
-See `:h slime.txt` for default keybindings to send text to a target. I repeat the suggested additional keymappings from the config section above:
+See `:h slime.txt` (from`jpalardy/vim-slime-ext-plugins` which should be installed with this plugin) for default keybindings to send text to a target. I repeat the suggested additional keymappings from the config section above:
 
 - `gz[operator/motion]`: send text using an operator or motion.
 - In visual mode `gz` can send visually selected text to the target.
