@@ -1,6 +1,6 @@
 # vim-slime-ext-neovim
 
-A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, enhancing your development workflow. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
+A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, enhancing your development workflow. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/); which must be installed for this plugin to work.  For help with that plugin once it is installed see `h:slime.txt`.
 
 ## What This Is
 
@@ -21,7 +21,7 @@ dependencies = { "jpalardy/vim-slime-ext-plugins" },
 
 
 config = function()
-
+	==setting the 
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
     -- recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
@@ -63,9 +63,9 @@ let g:slime_target_config = "slime_neovim#config"
 " recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
 set laststatus=2
 " Use external PID instead of Neovim's internal job id
-let g:slime_input_pid = 0
+let g:slime_input_pid=0
 " show ruler informaton
-let g:ruled_terminal = 0
+let g:ruled_terminal=0
 
 " Key mappings:
 " Send text using gz as operator before motion or text object
