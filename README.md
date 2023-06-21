@@ -18,9 +18,13 @@ This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal, all
 {
 'Klafyvel/vim-slime-ext-neovim',
 dependencies = { "jpalardy/vim-slime-ext-plugins" },
-config = function()
+
+init = function() -- It is good practice to set g: variavbles in in the init function; set before plugin is loaded
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
+end,
+
+config = function()
 
     -- recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
     vim.opt.laststatus = 2
@@ -61,7 +65,7 @@ let g:slime_target_config = "slime_neovim#config"
 " recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
 set laststatus=2
 " Use external PID instead of Neovim's internal job id
-let g:slime_input_pid = 1
+let g:slime_input_pid = 0
 " show ruler informaton
 let g:ruled_terminal = 0
 
