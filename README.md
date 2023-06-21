@@ -103,7 +103,7 @@ This plugin has the option (by setting `g:override_status` to a nonzero value) t
 
 If no terminals are open when you try to send text to one you will be prompted to do so. To do so, open a new split with `<C-w>s` or `<C-w>v` and then enter the command `:terminal` (built into neovim, just a reminder of how to do it).
 
-Call the `:SlimeConfig` function from an open buffer to reconfigure the terminal connection of that buffer.
+Call the `:SlimeConfig` function (defined in the base `vim-slime-ext-plugins` plugin) from an open buffer to reconfigure the terminal connection of that buffer.
 
 ## Capabilities Summary
 
