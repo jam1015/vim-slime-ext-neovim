@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: panvimdoc
-        uses: kdheepak/panvimdoc@main
+        uses: kdheepak/panvimdoc@v3.0.6
         with:
           vimdoc: vim-slime-ext-neovim
       - uses: stefanzweifel/git-auto-commit-action@v4
