@@ -10,7 +10,7 @@ The [vim-slime](https://github.com/jpalardy/vim-slime) plugin allows the user to
 
 [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/) in contrast provides infrastructure for sending text to a target, and leaves the community to develop plugins for each target.  
 
-This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal, allowing you to send text directly from your buffer. When you try to send text, you are prompted with an terminal identification number, which you can edit to select a different terminal if multiple are open, you can edit the prompt to pick a different one.  See details in the usage section below.
+This plugin extends `vim-slime-ext-plugins` and targets the built-in Neovim terminal, allowing you to send text directly from your buffer. When you try to send text, you are prompted with an terminal identification number, which you can edit to select a different terminal if multiple are open, you can edit the prompt to pick a different one.  See details in the usage section below.
 
 ## Example of Installation and Configuration Using lazy.nvim
 
