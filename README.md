@@ -36,7 +36,6 @@ config = function()
 
     -- show position info as the `ruler` setting does
     vim.g.ruled_terminal = 0
-    -- 
 
 	-- optional but useful keymaps:
 	---- send text using gz as operator before motion or text object
