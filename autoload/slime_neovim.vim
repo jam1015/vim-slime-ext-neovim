@@ -16,7 +16,7 @@ function! slime_neovim#config(config, ...)
 	endif
 	let id_in = 0
 	if get(g:, "slime_input_pid", 0)
-		let pid_in = input("pid: ", str2nr(slime_neovim#translate_id_to_pid(config_in["neovim"]["jobid"])))
+		let pid_in = input("pid: ", str2nr(jobpid(config_in["neovim"]["jobid"])))
 		let id_in = slime_neovim#translate_pid_to_id(pid_in)
 	else
 		if exists("g:slime_get_jobid")
@@ -117,7 +117,9 @@ function! slime_neovim#send(config, text)
 endfunction
 
 
+
 function! slime_neovim#translate_pid_to_id(pid)
+	" the built-in function jobpid() does the inverse of this
 	for ch in g:slime_last_channel
 		if ch['pid'] == a:pid
 			return ch['jobid']
@@ -126,14 +128,6 @@ function! slime_neovim#translate_pid_to_id(pid)
 	return -1
 endfunction
 
-function! slime_neovim#translate_id_to_pid(jobid)
-	for ch in g:slime_last_channel
-		if ch['jobid'] == a:jobid
-			return ch['pid']
-		endif
-	endfor
-	return -1
-endfunction
 
 function! s:NotExistsLastChannel() abort "
 	" check if slime_last_channel variable exists
