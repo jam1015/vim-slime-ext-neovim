@@ -1,7 +1,16 @@
 # vim-slime-ext-neovim
 
-A plugin to send code from a neovim Neovim buffer to a running Neovim terminal, enhancing your development workflow. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
+A plugin to send code from a Neovim buffer to a running Neovim terminal. This plugin uses Neovim's built-in terminal and extends [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
 
+## What This Is
+
+Say you are writing code in, for example, python. One way of quickly testing code is to have a terminal where you repeatedly source commands from the terminal.  For example if your file is `hello.py` you might have an editor open in one window, and a shell open in another where you input `python hello.py` after you save changes.  Another way might be to copy and paste your code to an open python session in the terminal.
+
+The [vim-slime](https://github.com/jpalardy/vim-slime) plugin allows the user to set keybindings to send text directly from a Vim or Neovim buffer to a running shell or window. Configuration code for each target is included in that repository.
+
+[vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/) in contrast provides infrastructure for sending text to a target, and leaves the community to develop plugins for each target.  
+
+This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal.
 
 ## Example of Installation and Configuration Using lazy.nvim
 
@@ -32,9 +41,7 @@ end
 
 Used to send text using the external PID rather than Neovim's internal job id. Setting this to a nonzero value (evaluated as `true` in vimscript), as is done here, is recommended because the PID is the number displayed on the status line of a terminal buffer, making it easier to select the desired terminal. This recommended setting is not the default because neovim  uses it's internal job id to send text to a terminal; the plugin has a function that translates the PID to the inernal job id.
 
-##### Additional Note
 
-Recall that when configuring neovim in lua, variables in the global `g:` namespace are set with `vim.g.foo = bar`.
 
 ## Vimscript, Configuration Only
 
@@ -56,15 +63,7 @@ xmap gz <Plug>SlimeRegionSend
 
 
 
-## What This Is
 
-Say you are writing code in, for example, python. One way of quickly testing code is to have a terminal where you repeatedly source commands from the terminal.  For example if your file is `hello.py` you might have an editor open in one window, and a shell open in another where you input `python hello.py` after you save changes.  Another way might be to copy and paste your code to an open python session in the terminal.
-
-The [vim-slime](https://github.com/jpalardy/vim-slime) plugin allows the user to set keybindings to send text directly from a Vim or Neovim buffer to a running shell or window. Configuration code for each target is included in that repository.
-
-[vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/) in contrast provides infrastructure for sending text to a target, and leaves the community to develop plugins for each target.  
-
-This plugin extends `vim-slime-ext-plugins` and targets the Neovim terminal.
 
 ## How to Use
 
