@@ -101,5 +101,3 @@ Under the hood Neovim sends text to a running a terminal using the `terminal_job
 
 
 - `job id`: the internal identifier that Neovim attaches to a running terminal process. `termnal_job_id` is the corresponding field in the `variables` section of `getbufinfo()`.
-
-
