@@ -1,17 +1,11 @@
 " autocmds to keep of terminal identification numbers whenever a terminal is opened or closed
-function! s:SetStatusline()
-	if exists("g:override_status") && g:override_status
-		if exists("g:ruled_terminal") && g:ruled_terminal
-			setlocal statusline=%{bufname()}%=%-14.(%l,%c%V%)\ %P\ \|\ id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
-		else
-			setlocal statusline=%{bufname()}%=id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
-		endif
-	endif
-endfunction
 
 augroup nvim_slime
 	autocmd!
+	" keeping track of channels that are open
 	autocmd TermOpen * call slime_neovim#SlimeAddChannel()
+	" keeping track when terminals are closed
 	autocmd TermClose * let b:terminal_closed = 1 | call slime_neovim#SlimeClearChannel()
-	autocmd TermOpen * call s:SetStatusline()
+	" setting status line to show job id and pid of terminal
+	autocmd TermOpen * call slime_neovim#SetStatusline()
 augroup END

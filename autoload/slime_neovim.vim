@@ -1,21 +1,22 @@
-" Public API for vim-slime to use.
+" Public API for vim-slime to use with Neovim's terminal.
 
+" Sets up the configuration for slime_neovim.
 function! slime_neovim#config(config, ...)
-
-	let internal = a:0 > 0 && a:1 == "internal" "testing if we called the function internally, or if slime_neovim_ext_plugins called it
+	" Check if function is called internally or by external plugins
+	let internal = a:0 > 0 && a:1 == "internal"
 
 	let config_in = a:config
 
+	" Ensure that a previous channel exists
 	if s:NotExistsLastChannel()
 		if internal
-			"debug
-			echom "Terminal not detected" 
 			throw "Terminal not detected."
 		else
 			return {}
 		endif
 	endif
 
+	" Validate the current configuration
 	if s:NotValidConfig(config_in)
 		let config_in = {}
 		let config_in["neovim"]= {"jobid": str2nr(get(g:slime_last_channel, -1, "")['jobid'])}
@@ -23,6 +24,7 @@ function! slime_neovim#config(config, ...)
 
 	let id_in = 0
 
+	" Get the jobid based on the configuration provided
 	if get(g:, "slime_input_pid", 0)
 		let pid_in = input("pid: ", str2nr(jobpid(config_in["neovim"]["jobid"])))
 		let id_in = slime_neovim#translate_pid_to_id(pid_in)
@@ -35,6 +37,7 @@ function! slime_neovim#config(config, ...)
 		endif
 	endif
 
+	" Ensure the id is valid
 	if id_in == -1
 		if internal
 			throw "No matching job id for the provided pid."
@@ -45,6 +48,7 @@ function! slime_neovim#config(config, ...)
 
 	let config_in["neovim"]["jobid"] = id_in
 
+	" Double-check the validity of the configuration
 	if s:NotValidConfig(config_in)
 		if internal
 			throw "Channel id not valid."
@@ -54,36 +58,27 @@ function! slime_neovim#config(config, ...)
 	endif
 
 	return config_in
-
 endfunction
 
-function! s:NotValidConfig(config) abort 
-	"checks if the current configuration refers to an actual running terminal
+" Checks if the current configuration is valid.
+function! s:NotValidConfig(config) abort
 	let not_valid = 1
 
+	" Ensure the config is a dictionary and a previous channel exists
 	if type(a:config) != v:t_dict || !exists("g:slime_last_channel")
 		return not_valid
 	endif
 
+	" Ensure the correct keys exist within the configuration
 	if has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') && index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0
 		let not_valid = 0
 		return not_valid
 	endif
 
 	return not_valid
-
 endfunction
 
-
-function! EchoListOfDicts(mylist)
-	for dict in a:mylist
-		echom 'Item:'
-		for [key, value] in items(dict)
-			echom '    ' . key . ': ' . value
-		endfor
-	endfor
-endfunction
-
+" Adds a new channel to the global variable tracking channels.
 function! slime_neovim#SlimeAddChannel()
 	if !exists("g:slime_last_channel")
 		let g:slime_last_channel = [{'jobid': &channel, 'pid': b:terminal_job_pid}]
@@ -92,6 +87,7 @@ function! slime_neovim#SlimeAddChannel()
 	endif
 endfunction
 
+" Clears out channels that are no longer active.
 function slime_neovim#SlimeClearChannel()
 	if !exists("g:slime_last_channel")
 		return
@@ -99,20 +95,19 @@ function slime_neovim#SlimeClearChannel()
 		unlet g:slime_last_channel
 	else
 		let bufinfo = getbufinfo()
-		call filter(bufinfo, {_, val -> has_key(val['variables'], "terminal_job_id") && 
-					\ has_key(val['variables'], "terminal_job_pid") && !get(val['variables'],"terminal_closed",0)})
+		call filter(bufinfo, {_, val -> has_key(val['variables'], "terminal_job_id") && has_key(val['variables'], "terminal_job_pid") && !get(val['variables'],"terminal_closed",0)})
 		call map(bufinfo, {_, val -> val["variables"]["terminal_job_id"] })
 		call filter(g:slime_last_channel, {_, val -> index(bufinfo, val["jobid"]) >= 0})
 	endif
 endfunction
 
+" Sends text to the specified channel.
 function! slime_neovim#send(config, text)
 	let config_in = a:config
-	"call slime_neovim#SlimeClearChannel()
 	let not_valid = s:NotValidConfig(config_in)
 
+	" Handle invalid configurations
 	if not_valid
-
 		try
 			let b:slime_config = slime_neovim#config(config_in, "internal")
 			let config_in = b:slime_config
@@ -129,13 +124,12 @@ function! slime_neovim#send(config, text)
 		endtry
 	endif
 
+	" Send the text to the channel
 	call chansend(str2nr(config_in["neovim"]["jobid"]), split(a:text, "\n", 1))
 endfunction
 
-
-
+" Translates a PID to its corresponding job ID.
 function! slime_neovim#translate_pid_to_id(pid)
-	" the built-in function jobpid() does the inverse of this
 	for ch in g:slime_last_channel
 		if ch['pid'] == a:pid
 			return ch['jobid']
@@ -144,22 +138,23 @@ function! slime_neovim#translate_pid_to_id(pid)
 	return -1
 endfunction
 
-
-function! s:NotExistsLastChannel() abort "
-	" check if slime_last_channel variable exists
-	let not_exists = 1
-
-	if !exists("g:slime_last_channel") || (len(g:slime_last_channel)) < 1
-		return not_exists
-	endif
-
-
-	let not_exists = 0
-	return not_exists
+" Checks if a previous channel does not exist or is empty.
+function! s:NotExistsLastChannel() abort
+	return (!exists("g:slime_last_channel") || (len(g:slime_last_channel)) < 1)
 endfunction
 
-
-
+" Transforms a channel dictionary into an array of job IDs.
 function! slime_neovim#channel_to_array(channel_dict)
 	return map(copy(a:channel_dict), {_, val -> val["jobid"]})
+endfunction
+
+" Sets the status line if the appropriate flags are enabled.
+function! slime_neovim#SetStatusline()
+	if exists("g:override_status") && g:override_status
+		if exists("g:ruled_terminal") && g:ruled_terminal
+			setlocal statusline=%{bufname()}%=%-14.(%l,%c%V%)\ %P\ \|\ id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
+		else
+			setlocal statusline=%{bufname()}%=id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
+		endif
+	endif
 endfunction
