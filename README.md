@@ -16,6 +16,8 @@ Note that `vim-slime-ext-plugins` is necessary as a dependency.
 
 Be aware that the values here are the ones preferred by the plugin author, not the defaults. The default is for the `vim.g` variables to not exist, which has the same effect as `false`.
 
+It is recommended to use `init` to set global variables so that they are present before the plugin loads. Otherwise they might not take effect.
+
 ```lua
 {
 'Klafyvel/vim-slime-ext-neovim',
