@@ -118,7 +118,8 @@ function! slime_neovim#send(config, text)
 			echo "Terminal not detected: Open a neovim terminal and try again. "
 			return
 		catch /Channel id not valid./
-			echo "Channel id not valid: Open a neovim terminal and try again. "
+			redraw!
+			echon "\n\nChannel id not valid. Try again."
 			return
 		finally
 		endtry

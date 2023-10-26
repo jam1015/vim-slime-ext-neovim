@@ -91,10 +91,11 @@ There are additionally commands available (taken from the base Slime documentati
 
 ## Configuration
 
+
+Global Variables (`vim.g.xxx`)  have to be created and set by the user.  By default they do not exist.
+
+
 ### Global Variables
-
-Have to be created and set by the user.  By default they do not exist.
-
 
 ---
 
@@ -155,14 +156,20 @@ vim.g.ruled_status = true
 Boolean that, when true, shows the coordinates of the cursor in the overridden status bar set by `vim.g.override_status`. Only takes effect if `vim.g.override_status` is `true`.
 
 
+### Mappings
+
+See the Usage and Example Installation sections for available commands, functions and mapping examples.
+
 
 ## Glossary
 
-PID
-:   Process IDentifier in Linux and MacOS. A unique number assigned to
-    each process when it\'s created. Corresponds to `terminal_job_pid`
-    in Neovim\'s `getbufinfo()` command.
+### PID
+   Process identifier in Linux and MacOS. A unique number assigned to
+    each process when it is created. Corresponds to `terminal_job_pid`
+    in Neovim's `getbufinfo()` command. Neovim also has a number analogous to PID in Windows.
 
-Job ID
-:   Neovim\'s internal identifier for a running terminal process.
+    TODO: Investigate what PID means in Neovim on Windows.
+
+### Job ID
+   Neovim's internal identifier for a running terminal process.
     Referenced as `terminal_job_id` in `getbufinfo()`.
