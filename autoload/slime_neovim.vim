@@ -32,13 +32,17 @@ function! slime_neovim#config(config, ...)
 		if exists("g:slime_get_jobid")
 			let id_in = g:slime_get_jobid()
 		else
+			if internal
+			let id_in = input("[internal] jobid: ", str2nr(config_in["neovim"]["jobid"]))
+		else
 			let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
+		endif
 			let id_in = str2nr(id_in)
 		endif
 	endif
 
 	" Ensure the id is valid
-	if id_in == -1
+	if id_in == -1  "the id wasn't found translate_pid_to_id
 		if internal
 			throw "No matching job id for the provided pid."
 		else
@@ -119,7 +123,7 @@ function! slime_neovim#send(config, text)
 			return
 		catch /Channel id not valid./
 			redraw!
-			echon "\n\nChannel id not valid. Try again."
+			echon "Channel id not valid. Try again."
 			return
 		finally
 		endtry
