@@ -2,7 +2,7 @@
 
 " Sets up the configuration for slime_neovim.
 function! slime_neovim#config(config, ...)
-	" Check if function is called internally or by external plugins
+	" Check if function is called internally or by external plugins, likely vim-slime-ext-plugins
 	let internal = a:0 > 0 && a:1 == "internal"
 
 	let config_in = a:config
