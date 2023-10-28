@@ -1,220 +1,175 @@
-*vim-slime-ext-neovim.txt*                  Helps send text to neovim terminal
+*vim-slime-ext-neovim.txt* 
 
 ==============================================================================
-Table of Contents                     *vim-slime-ext-neovim-table-of-contents*
 
-1. vim-slime-ext-neovim            |vim-slime-ext-neovim-vim-slime-ext-neovim|
-  - What This Is      |vim-slime-ext-neovim-vim-slime-ext-neovim-what-this-is|
-  - Example of Installation and Configuration Using lazy.nvim|vim-slime-ext-neovim-vim-slime-ext-neovim-example-of-installation-and-configuration-using-lazy.nvim|
-  - Vimscript, Configuration Only|vim-slime-ext-neovim-vim-slime-ext-neovim-vimscript,-configuration-only|
-  - How to Use          |vim-slime-ext-neovim-vim-slime-ext-neovim-how-to-use|
-  - Capabilities Summary|vim-slime-ext-neovim-vim-slime-ext-neovim-capabilities-summary|
-  - Glossary              |vim-slime-ext-neovim-vim-slime-ext-neovim-glossary|
+A plugin to send code from a Neovim buffer to a running Neovim terminal by extending [vim-slime-ext-plugins](https://github.com/jpalardy/vim-slime-ext-plugins/).
+
+That plugin is itself a modification of [vim-slime](https://github.com/jpalardy/vim-slime) to move platform-specific functionality to extension plugins like this one.
+
+Even though this documentation is for vim-slime-ext-neovim, it also reviews the functionality of `vim-slime-ext-plugins` and `vim-slime`
 
 ==============================================================================
-1. vim-slime-ext-neovim            *vim-slime-ext-neovim-vim-slime-ext-neovim*
 
-A plugin to send code from a neovim Neovim buffer to a running Neovim terminal,
-enhancing your development workflow. This plugin uses Neovim’s built-in
-terminal and extends vim-slime-ext-plugins
-<https://github.com/jpalardy/vim-slime-ext-plugins/>; which must be installed
-for this plugin to work. For help with that plugin once it is installed see
-`h:slime.txt`.
+Table of Contents
+- Introduction         |vim-slime-ext-neovim-introduction|
+- Installation         |vim-slime-ext-neovim-installation|
+- Usage                |vim-slime-ext-neovim-usage|
+- Configuration        |vim-slime-ext-neovim-configuration|
+- Global Variables     |vim-slime-ext-neovim-global-variables|
+- Mappings             |vim-slime-ext-neovim-mappings|
+- Glossary             |vim-slime-ext-neovim-glossary|
 
+==============================================================================
+INTRODUCTION                                                *vim-slime-ext-neovim-introduction*
 
-WHAT THIS IS          *vim-slime-ext-neovim-vim-slime-ext-neovim-what-this-is*
+This is a plugin to send code from a Neovim buffer to a running Neovim 
+terminal. This plugin extends |vim-slime-ext-plugins|, which is itself a 
+modification of |vim-slime|. This documentation is specifically for 
+vim-slime-ext-neovim but also reviews the functionality of vim-slime-ext-plugins 
+and vim-slime.
 
-Say you are writing code in, for example, python. One way of quickly testing
-code is to have a terminal where you repeatedly source commands from the
-terminal. For example if your file is `hello.py` you might have an editor open
-in one window, and a shell open in another where you input `python hello.py`
-after you save changes. Another way might be to copy and paste your code to an
-open python session in the terminal.
+Imagine you are testing quick changes to a Python script. One way to test 
+changes is to copy and paste into an open Python REPL in a Neovim terminal. 
+With this plugin, you can send the code directly to the REPL using Vim 
+operator/motion+text object combinations.
 
-The vim-slime <https://github.com/jpalardy/vim-slime> plugin allows the user to
-set keybindings to send text directly from a Vim or Neovim buffer to a running
-shell or window. Configuration code for each target is included in that
-repository.
+For example, if |SlimeMotionSend| is mapped to 'gz', 'gzip' can send an 
+uninterrupted block of text (a paragraph) to the REPL. This works for any 
+program in the terminal accepting text input.
 
-vim-slime-ext-plugins <https://github.com/jpalardy/vim-slime-ext-plugins/> in
-contrast provides infrastructure for sending text to a target, and leaves the
-community to develop plugins for each target.
+==============================================================================
+INSTALLATION                                                *vim-slime-ext-neovim-installation*
 
-This plugin extends `vim-slime-ext-plugins` and targets the built-in Neovim
-terminal, allowing you to send text directly from your buffer. When you try to
-send text, you are prompted with an terminal identification number, which you
-can edit to select a different terminal if multiple are open, you can edit the
-prompt to pick a different one. See details in the usage section below.
+Note: vim-slime-ext-plugins is a required dependency.
 
-
-EXAMPLE OF INSTALLATION AND CONFIGURATION USING LAZY.NVIM*vim-slime-ext-neovim-vim-slime-ext-neovim-example-of-installation-and-configuration-using-lazy.nvim*
+Example installation and configuration using |lazy.nvim|:
 
 >lua
-    {
-    'Klafyvel/vim-slime-ext-neovim',
-    dependencies = { "jpalardy/vim-slime-ext-plugins" },
-    
-    
-    config = function()
-    
-        --  setting the functions used to send text to the ones defined in this plugin; required by vim-slime-ext-plugins
-        vim.g.slime_target_send = "slime_neovim#send"
-        vim.g.slime_target_config = "slime_neovim#config"
-        -- recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
-        vim.opt.laststatus = 2
-    
-        -- allows use of PID rather than internal job_id for config see note below this codeblock
-        vim.g.slime_input_pid = 0
-    
-        -- override status bar of terminal to show pid and job id
-        vim.g.override_status = 1
-    
-        -- show position info as the `ruler` setting does
-        vim.g.ruled_terminal = 0
-    
-        -- optional but useful keymaps:
-        ---- send text using gz as operator before motion or text object
-        vim.keymap.set("n", "gz", "<Plug>SlimeMotionSend", { remap = true })
-        ---- send line of text
-        vim.keymap.set("n", "gzz", "<Plug>SlimeLineSend", { remap = true })
-        ---- send visual selection
-        vim.keymap.set("x", "gz", "<Plug>SlimeRegionSend", { remap = true })
-    end
-    }
-    
+{
+'Klafyvel/vim-slime-ext-neovim',
+dependencies = { "jpalardy/vim-slime-ext-plugins" },
+init = function()
+	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
+	-- these next two are essential, telling vim-slime-ext-plugins to use the functions from this plugin
+	vim.g.slime_target_send = "slime_neovim#send"
+	vim.g.slime_target_config = "slime_neovim#config"
+	vim.g.slime_input_pid = false -- use Neovim's internal Job ID rather than PID to select a terminal
+	vim.g.override_status = true -- Show the Job ID and PID in the status bar of a terminal
+	vim.g.ruled_status = true  -- If override_status is true, also show the cursor position in the status bar
+
+	--mappings
+	vim.keymap.set("n", "gz", "<Plug>SlimeMotionSend", { remap = true, silent = false })
+	vim.keymap.set("n", "gzz", "<Plug>SlimeLineSend", { remap = true, silent = false })
+	vim.keymap.set("x", "gz", "<Plug>SlimeRegionSend", { remap = true, silent = false })
+end,
+}
 <
 
+It's recommended to use `init` for setting global variables before the plugin 
+loads; otherwise, they might not take effect.
 
-NOTE ON G:SLIME_INPUT_PID ~
-
-Used to send text using the external PID rather than Neovim’s internal job
-id. Set based on preference. **Note that this plugin has the option to override
-the default terminal status line using the g:override_status option** to show
-the pid and job id clearly, on the far right, whereas the default setting only
-includes the pid in the name of the buffer. This will facilitate use of either
-the job id or job pid.
-
-
-ADDITIONAL NOTE
-
-Recall that when configuring neovim in lua, variables in the global `g:`
-namespace are set with `vim.g.foo = bar`.
-
-
-VIMSCRIPT, CONFIGURATION ONLY*vim-slime-ext-neovim-vim-slime-ext-neovim-vimscript,-configuration-only*
+Vimscript configuration is also possible:
 
 >vim
-    "   setting the functions used to send text to the ones defined in this plugin; required by vim-slime-ext-plugins
+    let g:slime_no_mappings = 1
     let g:slime_target_send = "slime_neovim#send"
     let g:slime_target_config = "slime_neovim#config"
-    
-    " recommended to show status bars to be able to see terminal job id and pid (is the Neovim default)
-    set laststatus=2
-    " Use external PID instead of Neovim's internal job id
-    let g:slime_input_pid=0
-    
-    " override status bar of terminal to show pid and job id
-    let g:override_status=1
-    
-    " show ruler informaton
-    let g:ruled_terminal=0
-    
-    " Key mappings:
-    " Send text using gz as operator before motion or text object
-    nmap gz <Plug>SlimeMotionSend
-    " Send line of text
-    nmap gzz <Plug>SlimeLineSend
-    " Send visual selection
+    let g:slime_input_pid = 0
+    let g:override_status = 1
+    let g:ruled_status = 1
+    map gz <Plug>SlimeMotionSend
+    map gzz <Plug>SlimeLineSend
     xmap gz <Plug>SlimeRegionSend
 <
 
 
-HOW TO USE              *vim-slime-ext-neovim-vim-slime-ext-neovim-how-to-use*
+==============================================================================
+USAGE                                                       *vim-slime-ext-neovim-usage*
 
-See `:h slime.txt` (from`jpalardy/vim-slime-ext-plugins` which should be
-installed with this plugin) for default keybindings to send text to a target. I
-repeat the suggested additional keymappings from the config section above:
+If `vim.g.slime_no_mappings = false`, default mappings will be defined. 
+Specific default mappings will be disabled if the user provides their own.
 
-- `gz[operator/motion]`: send text using an operator or motion.
-- In visual mode `gz` can send visually selected text to the target.
-- `gzz` sends the current line to the target.
+Default mappings:
 
-Of course these are optional and you can do what you want.
+  - <C-c><C-c> : Send the current paragraph to the terminal
+  - {Visual}<C-c><C-c> : Send highlighted text to the terminal
+  - <C-c>v : Configure the target terminal
 
-When you use one of these motions, the plugin will try to find the most
-recently opened terminal and select it as the target. You are prompted with the
-identification number (`terminal_job_id`) or (`terminal_job_pid` if
-`g:sline_input_pid` is set to a nonzero value). `terminal_job_id` is used by
-default because that is that Neovim internally uses to send text to the
-terminals.
+Additional plug mappings:
 
-This plugin has the option (by setting `g:override_status` to a nonzero value)
-to override the terminal status bar to show both the `terminal_job_id` and
-`terminal_job_pid` on the right, whereas without the override the
-`terminal_job_pid` is just included in the buffer name on the left. Recall that
-`laststatus` should be set to `2` to see a status bar in each window.
+  - |<Plug>SlimeConfig| : Configure the terminal for the current buffer
+  - |<Plug>SlimeRegionSend| : Send a visually selected region to the terminal
+  - |<Plug>SlimeLineSend| : Send a line to the terminal
+  - |<Plug>SlimeMotionSend| : Send text to the terminal based on motion/text-object
+  - |<Plug>SlimeParagraphSend| : Send text to the terminal based on motion/text-object
 
-If no terminals are open when you try to send text to one you will be prompted
-to do so. To do so, open a new split with `<C-w>s` or `<C-w>v` and then enter
-the command `:terminal` (built into neovim, just a reminder of how to do it).
+Additional commands:
 
-Call the `:SlimeConfig` function (defined in the base `vim-slime-ext-plugins`
-plugin) from an open buffer to reconfigure the terminal connection of that
-buffer.
+  - |:SlimeConfig| : Configure the terminal for the current buffer
+  - |:SlimeSend| : Send a range of lines to the terminal. For example to send lines three through five to the terminal, `:3,5SlimeSend`.
+  - |:SlimeSend1| : Send text to terminal, with a carriage return.  For example `:SlimeSend1 pwd`.
+  - |:SlimeSend0| : Send text, wrapped in literal quotes, [;to terminal, without a carriage return.  For example `:SlimeSend0 'pwd'`  or  `:SlimeSend0 "pwd"`.
 
+If you try to send text when no terminal is opened, you'll be prompted to 
+open one. If multiple terminals are open, you're prompted with the most recently opened terminal, but can seledt any.
 
-CAPABILITIES SUMMARY*vim-slime-ext-neovim-vim-slime-ext-neovim-capabilities-summary*
+==============================================================================
+CONFIGURATION                                               *vim-slime-ext-neovim-configuration*
 
-At the risk of repetition, this plugin:
+Global variables (`vim.g.xxx`) need to be created and set by the user. 
+By default, they do not exist, which has the same effect as their being `false`.
 
-
-KEEPS TRACK OF MULTIPLE TERMINALS ~
-
-It does this using the `g:slime_last_channel` variable which is an array of
-vimscript dictionaries containing the PIDs (external identifier) and job ids
-(Neovim internal identifier) of open Neovim terminals. If a connected terminal
-is closed, upon trying to send text again the user is prompted to pick another
-terminal, with the next-most recently opened terminal selected by default. If
-no terminals are available, or if there is misconfiguration, a helpful message
-telling you to open a new terminal is displayed. If you find the messages
-aren’t helpful enogh please leave feedback witha repo maintainer.
+Global variables are described in the next section.
 
 
-CAN USE PID OR INTERNAL JOB ID FOR CONFIGURATION ~
+==============================================================================
+GLOBAL VARIABLES                                        *vim-slime-ext-neovim-global-variables*
 
-Under the hood Neovim sends text to a running a terminal using the
-`terminal_job_id`, which are typically low numbers. Neovim also keeps track of
-the `terminal_job_pid` which is the system’s identifier, and importantly _is
-displayed on the status line of the terinal buffer_. The default settings are
-that the user if prompted with a `terminal_job_id` value, because this is what
-is used by neovim internally to send text to a terminal. However, because it is
-readily displayed for each running terminal, `terminal_job_pid` is much easier
-to manually configure, and that is why `vim.g.slime_input_pid=1` is included in
-the example configuration (the vimscript equivalent of this is `let
-g:slime_input_pid=1`.
+1. *g:slime_no_mappings*
+
+    When set to 1, default mappings are not created. This allows you to 
+    define your own. Default is 0.
+
+        let g:slime_no_mappings = 1
+
+2. *g:slime_target_send*
+
+    Specifies the function used for sending text to the terminal. Set to `slim_neovim#send` to use this plugin.
+
+        let g:slime_target_send = "slime_neovim#send"
+
+3. *g:slime_target_config*
+
+    Specifies the function used for configuring the target terminal.  Set to `slim_neovim#config` to use this plugin.
+
+        let g:slime_target_config = "slime_neovim#config"
+
+4. *g:slime_input_pid*
+
+    When set to 0, use |job-id| instead of system PID to selecct a terminal.
+
+        let g:slime_input_pid = 0
+
+    Note that PID is the identifier number that is used by the operating 
+    system to manage running processes.
+
+5. *g:override_status*
+
+    When set to 1, overrides the status line of terminals to show the |job-id| and system PID.
+    terminal.
+
+        let g:override_status = 1
+
+6. *g:ruled_status*
+
+    When set to 1, displays rules in the status line to indicate the target
+    terminal.
+
+        let g:ruled_status = 1
+
+==============================================================================
+MAPPINGS                                                   *vim-slime-ext-neovim-mappings*
+
+See  |vim-slime-ext-neovim-usage| and |vim-slime-ext-neovim-installation| for available commands, functions and mapping examples.
 
 
-CAN OVERRIDE STATUS BAR OF TERMINAL BUFFERS ~
-
-To show `terminal_job_id` and `terminal_job_pid` on bottom right, set the
-`g:override_status` variable to a nonzero value. See configuration for
-`g:ruled_terminal` setting, which will turn on or off cursor position
-information. The status line override basically turns off the `ruler` setting
-unless `g:ruled_terminal` is nonzero, in which case the basic `ruler` position
-information is included. Custom `ruler` formats are not supported.
-
-
-GLOSSARY                  *vim-slime-ext-neovim-vim-slime-ext-neovim-glossary*
-
-- `PID`: In Linux, PID stands for "Process IDentifier". A PID is a unique number
-    that is automatically assigned to each process when it is created on a
-    Unix-like operating system. A process is an executing (i.e., running) instance
-    of a program. Applies to Macos as well. Represented as `terminal_job_pid` in
-    under the `variables` field of the `getbufinfo()` Neovim vimscript command.
-- `job id`: the internal identifier that Neovim attaches to a running terminal
-    process. `termnal_job_id` is the corresponding field in the `variables` section
-    of `getbufinfo()`.
-
-Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
-
-vim:tw=78:ts=8:noet:ft=help:norl:

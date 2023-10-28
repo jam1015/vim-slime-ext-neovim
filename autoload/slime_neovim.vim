@@ -118,7 +118,8 @@ function! slime_neovim#send(config, text)
 			echo "Terminal not detected: Open a neovim terminal and try again. "
 			return
 		catch /Channel id not valid./
-			echo "Channel id not valid: Open a neovim terminal and try again. "
+			redraw!
+			echon "\n\nChannel id not valid. Try again."
 			return
 		finally
 		endtry
@@ -151,7 +152,7 @@ endfunction
 " Sets the status line if the appropriate flags are enabled.
 function! slime_neovim#SetStatusline()
 	if exists("g:override_status") && g:override_status
-		if exists("g:ruled_terminal") && g:ruled_terminal
+		if exists("g:ruled_status") && g:ruled_status
 			setlocal statusline=%{bufname()}%=%-14.(%l,%c%V%)\ %P\ \|\ id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
 		else
 			setlocal statusline=%{bufname()}%=id:\ %{b:terminal_job_id}\ pid:\ %{b:terminal_job_pid}
