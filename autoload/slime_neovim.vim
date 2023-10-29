@@ -3,24 +3,8 @@
 " Sets up the configuration for slime_neovim.
 function! slime_neovim#config(config, ...)
 	" Check if function is called internally or by external plugins, likely vim-slime-ext-plugins
-	let internal = a:0 > 0 && a:1 == "internal"
 
 	let config_in = a:config
-
-	" Ensure that a previous channel exists
-	if s:NotExistsLastChannel()
-		if internal
-			throw "Terminal not detected."
-		else
-			return {}
-		endif
-	endif
-
-	" Validate the current configuration
-	if s:NotValidConfig(config_in)
-		let config_in = {}
-		let config_in["neovim"]= {"jobid": str2nr(get(g:slime_last_channel, -1, "")['jobid'])}
-	endif
 
 	let id_in = 0
 
@@ -33,15 +17,33 @@ function! slime_neovim#config(config, ...)
 			let id_in = g:slime_get_jobid()
 		else
 			if internal
-			let id_in = input("[internal] jobid: ", str2nr(config_in["neovim"]["jobid"]))
-		else
-			let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
-		endif
+				let id_in = input("[internal] jobid: ", str2nr(config_in["neovim"]["jobid"]))
+			else
+				let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
+			endif
 			let id_in = str2nr(id_in)
 		endif
 	endif
 
-	" Ensure the id is valid
+	let config_in["neovim"]["jobid"] = id_in
+
+
+	return config_in
+endfunction
+
+" Checks if the current configuration is valid.
+function! s:NotValidConfig(config) abort
+	" Ensure that a previous channel exists
+	let not_valid = 1
+
+	if s:NotExistsLastChannel()
+		if internal
+			throw "Terminal not detected."
+		else
+			return {}
+		endif
+	endif
+
 	if id_in == -1  "the id wasn't found translate_pid_to_id
 		if internal
 			throw "No matching job id for the provided pid."
@@ -49,24 +51,6 @@ function! slime_neovim#config(config, ...)
 			return {}
 		endif
 	endif
-
-	let config_in["neovim"]["jobid"] = id_in
-
-	" Double-check the validity of the configuration
-	if s:NotValidConfig(config_in)
-		if internal
-			throw "Channel id not valid."
-		else
-			return {}
-		endif
-	endif
-
-	return config_in
-endfunction
-
-" Checks if the current configuration is valid.
-function! s:NotValidConfig(config) abort
-	let not_valid = 1
 
 	" Ensure the config is a dictionary and a previous channel exists
 	if type(a:config) != v:t_dict || !exists("g:slime_last_channel")
