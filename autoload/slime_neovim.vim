@@ -34,36 +34,27 @@ endfunction
 " Checks if the current configuration is valid.
 function! s:NotValidConfig(config) abort
 	" Ensure that a previous channel exists
-	let not_valid = 1
 
 	if s:NotExistsLastChannel()
-		if internal
-			throw "Terminal not detected."
-		else
-			return {}
-		endif
+		throw "Terminal not detected."
 	endif
 
-	if id_in == -1  "the id wasn't found translate_pid_to_id
-		if internal
-			throw "No matching job id for the provided pid."
-		else
-			return {}
-		endif
+	if a:config["neovim"]["jobid"] == -1  "the id wasn't found translate_pid_to_id
+		throw "No matching job id for the provided pid."
 	endif
 
 	" Ensure the config is a dictionary and a previous channel exists
 	if type(a:config) != v:t_dict || !exists("g:slime_last_channel")
-		return not_valid
+		throw "Channel id not valid."
 	endif
 
 	" Ensure the correct keys exist within the configuration
-	if has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') && index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0
-		let not_valid = 0
-		return not_valid
+	if !(has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') && index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0)
+		throw "Channel id not valid."
 	endif
 
-	return not_valid
+	return 1
+
 endfunction
 
 " Adds a new channel to the global variable tracking channels.
@@ -92,24 +83,27 @@ endfunction
 " Sends text to the specified channel.
 function! slime_neovim#send(config, text)
 	let config_in = a:config
-	let not_valid = s:NotValidConfig(config_in)
+	try
+		let valid = s:ValidConfig(config_in)
 
+	catch /No matching job id for the provided pid/
+		echo "No matching job id for the provided pid.  Try again. "
+		return
+	catch /Terminal not detected./
+		echo "Terminal not detected: Open a neovim terminal and try again. "
+		return
+	catch /Channel id not valid./
+		redraw!
+		echon "Channel id not valid. Try again."
+		return
+	finally
+
+	endtry
 	" Handle invalid configurations
-	if not_valid
+	if !valid
 		try
 			let b:slime_config = slime_neovim#config(config_in, "internal")
 			let config_in = b:slime_config
-		catch /No matching job id for the provided pid/
-			echo "No matching job id for the provided pid.  Try again. "
-			return
-		catch /Terminal not detected./
-			echo "Terminal not detected: Open a neovim terminal and try again. "
-			return
-		catch /Channel id not valid./
-			redraw!
-			echon "Channel id not valid. Try again."
-			return
-		finally
 		endtry
 	endif
 
