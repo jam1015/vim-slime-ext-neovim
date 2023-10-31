@@ -27,6 +27,30 @@ function! slime_neovim#config(config, ...)
 
 	let config_in["neovim"]["jobid"] = id_in
 
+	try
+		let valid = s:ValidConfig(config_in)
+
+	catch /No matching job id for the provided pid/
+		echo "No matching job id for the provided pid.  Try again. "
+		return
+	catch /Terminal not detected./
+		echo "Terminal not detected: Open a neovim terminal and try again. "
+		return
+	catch /Channel id not valid./
+		redraw!
+		echon "Channel id not valid. Try again."
+		return
+	finally
+
+	endtry
+	" Handle invalid configurations
+	if !valid
+		try
+			unlet b:slime_config
+			unlet g:slime_config
+			let config_in = b:slime_config
+		endtry
+	endif
 
 	return config_in
 endfunction
@@ -83,29 +107,8 @@ endfunction
 " Sends text to the specified channel.
 function! slime_neovim#send(config, text)
 	let config_in = a:config
-	try
-		let valid = s:ValidConfig(config_in)
+	let valid = 0
 
-	catch /No matching job id for the provided pid/
-		echo "No matching job id for the provided pid.  Try again. "
-		return
-	catch /Terminal not detected./
-		echo "Terminal not detected: Open a neovim terminal and try again. "
-		return
-	catch /Channel id not valid./
-		redraw!
-		echon "Channel id not valid. Try again."
-		return
-	finally
-
-	endtry
-	" Handle invalid configurations
-	if !valid
-		try
-			let b:slime_config = slime_neovim#config(config_in, "internal")
-			let config_in = b:slime_config
-		endtry
-	endif
 
 	" Send the text to the channel
 	call chansend(str2nr(config_in["neovim"]["jobid"]), split(a:text, "\n", 1))
