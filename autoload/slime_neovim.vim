@@ -49,24 +49,8 @@ function! slime_neovim#ValidateConfig(config, config_provided) abort
 	endif
 
 
-	return {"valid": 1, "continue": 1}
+	return valid
 
-endfunction
-
-function! slime_neovim#set_config_state(just_ran, valid) abort
-	"lets the config function communicate with the 'send' function
-	let g:just_ran_config = {}
-	if a:just_ran
-		let g:just_ran_config["just_ran"] = 1
-	else
-		let g:just_ran_config["just_ran"] = 0
-	endif
-
-	if a:valid
-		let g:just_ran_config["valid"] = 1
-	else
-		let g:just_ran_config["valid"] = 0
-	endif
 endfunction
 
 
@@ -75,7 +59,6 @@ function! slime_neovim#config(config, ...) abort
 
 	let confg_in = a:config
 
-	let validity_state = slime_neovim:ValidateConfig(config_in, false) "second argument iw whether the user has proovided a confiuration yeat
 
 	if !validity_state["valid"] && !validity_state["continue"]
 
@@ -88,7 +71,6 @@ function! slime_neovim#config(config, ...) abort
 			unlet g:slime_config
 		endif
 
-		call slime_neovim#set_config_state(1, 0) 
 		return {}
 
 	endif
