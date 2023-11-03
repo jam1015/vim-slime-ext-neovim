@@ -1,86 +1,15 @@
 " Public API for vim-slime to use with Neovim's terminal.
 
-" Sets up the configuration for slime_neovim.
-function! slime_neovim#ValidateConfig(config, config_provided) abort
-	" config_provided generally conveys whether the user has already explicitly provided a configuration
-
-	" Ensure that a previous channel exists
-	let valid = 0
-
-	if slime_neovim#NotExistsLastChannel()
-		echo "Terminal not detected: Open a neovim terminal and try again. "
-		return {"valid": 0,  "continue": 0}
-	endif
-
-
-	if !exists("a:config") ||  a:config == v:null
-		echo "Config does not exist."
-		return {"valid": 0,  "continue": 1}
-	endif
-
-
-	" Ensure the config is a dictionary and a previous channel exists
-	if type(a:config) != v:t_dict 
-		echo "Config type not valid."
-		return {"valid": 0,  "continue": 1}
-	endif
-
-	if empty(a:config)
-		echo "Config is empty."
-		return {"valid": 0,  "continue": 1}
-	endif
-
-	if config_provided
-		" Ensure the correct keys exist within the configuration
-		if !(has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') )
-			echo "Improper configuration structure Try again"
-			return {"valid": 0,  "continue": 1}
-		endif
-
-		if a:config["neovim"]["jobid"] == -1  "the id wasn't found translate_pid_to_id
-			echo "No matching job id for the provided pid. Try again"
-			return {"valid": 0,  "continue": 1}
-		endif
-
-		if index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0
-			throw "Job ID not found. Try again."
-			return {"valid": 0,  "continue": 1}
-		endif
-	endif
-
-
-	return valid
-
-endfunction
-
-
 function! slime_neovim#config(config, ...) abort
 	" Check if function is called internally or by external plugins, likely vim-slime-ext-plugins
 
-	let confg_in = a:config
+	let config_in = a:config
+	if empty(config_in)
 
-
-	if !validity_state["valid"] && !validity_state["continue"]
-
-		if exists("b:slime_config")
-			unlet b:slime_config
-		endif
-
-
-		if exists("g:slime_config")
-			unlet g:slime_config
-		endif
-
-		return {}
-
-	endif
-
-	if !validity_state["valid"] && validity_state["continue"]
-		let last_pid = get(get(g:slime_last_channel, -1, {}), 'pid', 'default_value')
-		let last_job = get(get(g:slime_last_channel, -1, {}), 'jobid', 'default_value')
+		let last_pid = get(get(g:slime_last_channel, -1, {}), 'pid', '')
+		let last_job = get(get(g:slime_last_channel, -1, {}), 'jobid', '')
 		let config_in = {"neovim": {"jobid":  last_job, "pid": last_pid }}
 	endif
-
 
 
 
@@ -101,22 +30,58 @@ function! slime_neovim#config(config, ...) abort
 	let config_in["neovim"]["jobid"] = id_in
 	let config_in["neovim"]["pid"] = pid_in
 
-	let valid = slime_neovim#ValidateConfig(config_in, true)
-
-
-	if !valid
-
-		let config_in = {}
-	endif
-
 	return config_in
 endfunction
 
 
+"evaluates whether ther is a terminal running; if there isn't then no config can be valid
+function! slime_neovim#validate_env(config) abort
+	if slime_neovim#NotExistsLastChannel()
+		echo "Terminal not detected: Open a neovim terminal and try again. "
+		return 0
+	endif
+	return 1
+endfunction
 
+" "checks that a configuration is valid
+" returns boolean of whether the supplied config is valid
+function! slime_neovim#validate_config(config) abort
 
+	if !exists("a:config") ||  a:config == v:null
+		echo "Config does not exist."
+		return 0
+	endif
 
+	" Ensure the config is a dictionary and a previous channel exists
+	if type(a:config) != v:t_dict 
+		echo "Config type not valid."
+		return 0
+	endif
 
+	if empty(a:config)
+		echo "Config is empty."
+		return 0
+	endif
+
+	" Ensure the correct keys exist within the configuration
+	if !(has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') )
+		echo "Improper configuration structure Try again"
+		return 0
+	endif
+
+	if a:config["neovim"]["jobid"] == -1  "the id wasn't found translate_pid_to_id
+		echo "No matching job id for the provided pid. Try again"
+		return 0
+	endif
+
+	if index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0
+		throw "Job ID not found. Try again."
+		return 0
+	endif
+
+	return 1
+
+endfunction
 
 
 
@@ -147,13 +112,8 @@ endfunction
 " Sends text to the specified channel.
 function! slime_neovim#send(config, text)
 	let config_in = a:config
-	let valid = 0
-
-	if exists("g:just_ran_config") && g:just_ran_config["just_ran"] && g:just_ran_config["valid"]
-
-		" Send the text to the channel
-		call chansend(str2nr(config_in["neovim"]["jobid"]), split(a:text, "\n", 1))
-	endif
+	" Send the text to the channel
+	call chansend(str2nr(config_in["neovim"]["jobid"]), split(a:text, "\n", 1))
 endfunction
 
 " Translates a PID to its corresponding job ID.

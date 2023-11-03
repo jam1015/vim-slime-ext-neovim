@@ -9,3 +9,4 @@ augroup nvim_slime
 	" setting status line to show job id and pid of terminal
 	autocmd TermOpen * call slime_neovim#SetStatusline()
 augroup END
+

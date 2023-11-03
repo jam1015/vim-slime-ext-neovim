@@ -22,12 +22,6 @@ Table of Contents
 ==============================================================================
 INTRODUCTION                                                *vim-slime-ext-neovim-introduction*
 
-This is a plugin to send code from a Neovim buffer to a running Neovim 
-terminal. This plugin extends |vim-slime-ext-plugins|, which is itself a 
-modification of |vim-slime|. This documentation is specifically for 
-vim-slime-ext-neovim but also reviews the functionality of vim-slime-ext-plugins 
-and vim-slime.
-
 Imagine you are testing quick changes to a Python script. One way to test 
 changes is to copy and paste into an open Python REPL in a Neovim terminal. 
 With this plugin, you can send the code directly to the REPL using Vim 
@@ -42,6 +36,7 @@ INSTALLATION                                                *vim-slime-ext-neovi
 
 Note: vim-slime-ext-plugins is a required dependency.
 
+
 Example installation and configuration using |lazy.nvim|:
 
 >lua
@@ -49,10 +44,13 @@ Example installation and configuration using |lazy.nvim|:
 'Klafyvel/vim-slime-ext-neovim',
 dependencies = { "jpalardy/vim-slime-ext-plugins" },
 init = function()
-	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
 	-- these next two are essential, telling vim-slime-ext-plugins to use the functions from this plugin
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
+	-- two functions that help make sure your configuration and environment are correct
+	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
+	vim.g.slime_validate_env = "slime_neovim#validate_env"  -- checks if at least one Neovim terminal is running
+	vim.g.slime_validate_config = "slime_neovim#validate_config" -- checks if the configuration is correct
 	vim.g.slime_input_pid = false -- use Neovim's internal Job ID rather than PID to select a terminal
 	vim.g.override_status = true -- Show the Job ID and PID in the status bar of a terminal
 	vim.g.ruled_status = true  -- If override_status is true, also show the cursor position in the status bar
@@ -74,6 +72,8 @@ Vimscript configuration is also possible:
     let g:slime_no_mappings = 1
     let g:slime_target_send = "slime_neovim#send"
     let g:slime_target_config = "slime_neovim#config"
+	let g:slime_validate_env = "slime_neovim#validate_env"
+	let g:slime_validate_config = "slime_neovim#validate_config"
     let g:slime_input_pid = 0
     let g:override_status = 1
     let g:ruled_status = 1
@@ -82,6 +82,14 @@ Vimscript configuration is also possible:
     xmap gz <Plug>SlimeRegionSend
 <
 
+
+That plugin defines the variables
+- |vim.g.slime_target_send`| 
+- |vim.g.slime_target_config`| 
+- |vim.g.slime_validate_config`| and 
+- |vim.g.slime_validate_env| 
+
+We set them to the proper functions defined to allow sending text to a neovim terminal, configuration of which terminal to send, and validation of the configuration and the Neovim environment.
 
 ==============================================================================
 USAGE                                                       *vim-slime-ext-neovim-usage*
@@ -125,26 +133,51 @@ Global variables are described in the next section.
 ==============================================================================
 GLOBAL VARIABLES                                        *vim-slime-ext-neovim-global-variables*
 
-1. *g:slime_no_mappings*
+1. |g:slime_no_mappings|
 
-    When set to 1, default mappings are not created. This allows you to 
+    When set to 1, default mappings are not created. This allows you to
     define your own. Default is 0.
 
-        let g:slime_no_mappings = 1
+    >vim
+    let g:slime_no_mappings = 1
+	<
 
-2. *g:slime_target_send*
+2. |g:slime_target_send|
 
-    Specifies the function used for sending text to the terminal. Set to `slim_neovim#send` to use this plugin.
+    Specifies the function used for sending text to the terminal. Set to *slim_neovim#send* to use this plugin.
 
-        let g:slime_target_send = "slime_neovim#send"
+	>vim
+    let g:slime_target_send = "slime_neovim#send"
+	<
 
-3. *g:slime_target_config*
+3. |g:slime_validate_env|
 
-    Specifies the function used for configuring the target terminal.  Set to `slim_neovim#config` to use this plugin.
+    Specifies the function used to make sure that then environment is valid. For Neovim that means that  there 
+	is a Neovim terminal running.  Set to *slim_neovim#config* to use this plugin.
 
-        let g:slime_target_config = "slime_neovim#config"
+	>vim
+     let g:slime_validate_env = "slime_neovim#validate_env"
+	<vim
 
-4. *g:slime_input_pid*
+4. |g:slime_validate_config|
+
+    Specifies function that is used to ensure that a configuration is valid.
+
+5. *g:slime_target_config*
+
+    Specifies the function used for configuring the target terminal.  Set to *slim_neovim#config* to use this plugin.
+
+
+4. *g:slime_validate_env*
+
+     let g:slime_validate_env = "slime_neovim#config"
+
+
+5. *g:slime_validate_env*
+
+     let g:slime_target_config = "slime_neovim#config"
+
+6. *g:slime_input_pid*
 
     When set to 0, use |job-id| instead of system PID to selecct a terminal.
 
@@ -153,14 +186,14 @@ GLOBAL VARIABLES                                        *vim-slime-ext-neovim-gl
     Note that PID is the identifier number that is used by the operating 
     system to manage running processes.
 
-5. *g:override_status*
+7. *g:override_status*
 
     When set to 1, overrides the status line of terminals to show the |job-id| and system PID.
     terminal.
 
         let g:override_status = 1
 
-6. *g:ruled_status*
+8. *g:ruled_status*
 
     When set to 1, displays rules in the status line to indicate the target
     terminal.

@@ -12,21 +12,32 @@ Imagine that you are testing quick changes to, for example, a python script.  On
 
 ## Example Installation and Configuration Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
-Note that `vim-slime-ext-plugins` is necessary as a dependency.
+Note that `vim-slime-ext-plugins` is necessary as a dependency. That plugin defines the `vim.g.slime_target_send`, `vim.g.slime_target_config`, `vim.g.slime_validate_config`, and `vim.g.slime_validate_env` variables. We set them to the proper functions defined to allow sending text to a neovim terminal, configuration of which terminal to send, and validation of the configuration and the Neovim environment.
 
-Be aware that the values here are the ones preferred by the plugin author, not the defaults. The default is for the `vim.g` variables to not exist, which has the same effect as `false`.
+Be aware that the other configuration values here are the ones preferred by the plugin author, not the defaults. The default is for the `vim.g` variables to not exist, which has the same effect as `false`.
 
 It is recommended to use `init` to set global variables so that they are present before the plugin loads. Otherwise they might not take effect.
+
+
 
 ```lua
 {
 'Klafyvel/vim-slime-ext-neovim',
 dependencies = { "jpalardy/vim-slime-ext-plugins" },
 init = function()
-	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
+
+
+    -- -- these next four functions are essential. they could be wrapped in an `ini` function but
+       -- I leave them here for the user to set explicitly
+
 	-- these next two are essential, telling vim-slime-ext-plugins to use the functions from this plugin
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
+	-- two functions that help make sure your configuration and environment are correct
+	vim.g.slime_validate_env = "slime_neovim#validate_env"  -- checks if at least one Neovim terminal is running
+	vim.g.slime_validate_config = "slime_neovim#validate_config" -- checks if the configuration is correct
+
+	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
 	vim.g.slime_input_pid = false -- use Neovim's internal Job ID rather than PID to select a terminal
 	vim.g.override_status = true -- Show the Job ID and PID in the status bar of a terminal
 	vim.g.ruled_status = true  -- If override_status is true, also show the cursor position in the status bar
@@ -44,9 +55,11 @@ end,
 ### Vimscript Config
 
 ```vim
-let g:slime_no_mappings = 1
 let g:slime_target_send = "slime_neovim#send"
 let g:slime_target_config = "slime_neovim#config"
+let g:slime_validate_env = "slime_neovim#validate_env"
+let g:slime_validate_config = "slime_neovim#validate_config"
+let g:slime_no_mappings = 1
 let g:slime_input_pid = 0
 let g:override_status = 1
 let g:ruled_status = 1
@@ -56,19 +69,20 @@ xmap gz <Plug>SlimeRegionSend
 ```
 
 
-It is recommended to use `init` instead of `config` for plugin configuration involving global variables.
+Note once more that it is recommended to use `init` instead of `config` for plugin configuration involving global variables.
 
 ## Usage
 
-If `vim.g.slime_no_mappings = false` default mappings will be defined. If the user provides their own mappings, those specific default mappings will be disabled. 
 
+### Default Mappings
 
-The default mappings are:
+If `vim.g.slime_no_mappings = false` default mappings will be defined. If the user provides their own mappings, those specific default mappings will be disabled in favor of those defined by the user.
 
 - <C-c><C-c> send current paragraph to terminal.
 - {Visual}<c-c><c-c>  Send highlighted text to terminal.
 - <c-c>v configure the target terminal.
 
+### Available Plug Mappings
 Use the `<Plug>` mappings from `vim-slime-ext-plugins` to send text to a running Neovim terminal. Upon running them, if a terminal has not been configured as the target, the user will be prompted to select one based on either the Job Id number or the PID, or to open one if no terminal is detected.
 
 - `<Plug>SlimeConfig` configure the target terminal for the current buffer.
@@ -79,7 +93,7 @@ Use the `<Plug>` mappings from `vim-slime-ext-plugins` to send text to a running
 
 For this plugin (`vim-slime-ext-neovim`) if you try to send text to a terminal when none is opened, you will be prompted to do so. If multiple terminals are opened, you are prompted to select the most recently opened terminal, but can select any terminal.
 
-There are additionally commands available (taken from the base Slime documentation):
+### Available Ex Commands
 
 - `:SlimeConfig` configures the current buffer to select a terminal.
 - `<range>SlimeSend` send the range of lines to the terminal. For example to send lines three through five to the terminal, `:3,5SlimeSend`.
@@ -116,6 +130,22 @@ vim.g.slime_target_send = "slime_neovim#send"
 
 (defined in `vim-slime-ext-plugins`) This variable holds the function that actually sends text to the terminal. We set it to the function defined in this plugin.
 
+
+---
+
+```
+vim.g.slime_validate_env = "slime_neovim#validate_env"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function checks if the environment contains a valid target. For Neovim this in practice checks if a terminal is open.
+
+---
+
+```
+vim.g.slime_validate_config = "slime_neovim#validate_config"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function checks if a configuration is valid.
 
 ---
 
@@ -156,6 +186,8 @@ vim.g.ruled_status = true
 Boolean that, when true, shows the coordinates of the cursor in the overridden status bar set by `vim.g.override_status`. Only takes effect if `vim.g.override_status` is `true`.
 
 
+---
+
 ### Mappings
 
 See the Usage and Example Installation sections for available commands, functions and mapping examples.
@@ -166,9 +198,9 @@ See the Usage and Example Installation sections for available commands, function
 ### PID
    Process identifier in Linux and MacOS. A unique number assigned to
     each process when it is created. Corresponds to `terminal_job_pid`
-    in Neovim's `getbufinfo()` command. Neovim also has a number analogous to PID in Windows.
+    in Neovim's `getbufinfo()` command. Neovim also has a PID for terminal processes running on windows. The plugin author has yet to investigate what that number actually means on an Windows system.
 
-    TODO: Investigate what PID means in Neovim on Windows.
+
 
 ### Job ID
    Neovim's internal identifier for a running terminal process.
