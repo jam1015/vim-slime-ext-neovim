@@ -12,7 +12,7 @@ Imagine that you are testing quick changes to, for example, a python script.  On
 
 ## Example Installation and Configuration Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
-Note that `vim-slime-ext-plugins` is necessary as a dependency. That plugin defines the `vim.g.slime_target_send`, `vim.g.slime_target_config`, `vim.g.slime_validate_config`, and `vim.g.slime_validate_env` variables. We set them to the proper functions defined to allow sending text to a neovim terminal, configuration of which terminal to send, and validation of the configuration and the Neovim environment.
+Note that `vim-slime-ext-plugins` is necessary as a dependency. That plugin defines the `vim.g.slime_target_send`, `vim.g.slime_target_config`, `vim.g.slime_valid_config`, and `vim.g.slime_valid_env` variables. We set them to the proper functions defined to allow sending text to a neovim terminal, configuration of which terminal to send, and validation of the configuration and the Neovim environment.
 
 Be aware that the other configuration values here are the ones preferred by the plugin author, not the defaults. The default is for the `vim.g` variables to not exist, which has the same effect as `false`.
 
@@ -34,8 +34,8 @@ init = function()
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
 	-- two functions that help make sure your configuration and environment are correct
-	vim.g.slime_validate_env = "slime_neovim#validate_env"  -- checks if at least one Neovim terminal is running
-	vim.g.slime_validate_config = "slime_neovim#validate_config" -- checks if the configuration is correct
+	vim.g.slime_valid_env = "slime_neovim#valid_env"  -- checks if at least one Neovim terminal is running
+	vim.g.slime_valid_config = "slime_neovim#valid_config" -- checks if the configuration is correct
 
 	vim.g.slime_no_mappings = true -- I prefer to turn off default mappings; see below for more details
 	vim.g.slime_input_pid = false -- use Neovim's internal Job ID rather than PID to select a terminal
@@ -57,8 +57,8 @@ end,
 ```vim
 let g:slime_target_send = "slime_neovim#send"
 let g:slime_target_config = "slime_neovim#config"
-let g:slime_validate_env = "slime_neovim#validate_env"
-let g:slime_validate_config = "slime_neovim#validate_config"
+let g:slime_valid_env = "slime_neovim#valid_env"
+let g:slime_valid_config = "slime_neovim#valid_config"
 let g:slime_no_mappings = 1
 let g:slime_input_pid = 0
 let g:override_status = 1
@@ -134,7 +134,7 @@ vim.g.slime_target_send = "slime_neovim#send"
 ---
 
 ```
-vim.g.slime_validate_env = "slime_neovim#validate_env"
+vim.g.slime_valid_env = "slime_neovim#valid_env"
 ```
 
 (defined in `vim-slime-ext-plugins`) This variable holds the function checks if the environment contains a valid target. For Neovim this in practice checks if a terminal is open.
@@ -142,7 +142,7 @@ vim.g.slime_validate_env = "slime_neovim#validate_env"
 ---
 
 ```
-vim.g.slime_validate_config = "slime_neovim#validate_config"
+vim.g.slime_valid_config = "slime_neovim#valid_config"
 ```
 
 (defined in `vim-slime-ext-plugins`) This variable holds the function checks if a configuration is valid.
@@ -188,6 +188,47 @@ Boolean that, when true, shows the coordinates of the cursor in the overridden s
 
 ---
 
+### Buffer Local Variables
+
+The have the same function over the analogous global variables, but take precedence.
+
+---
+
+
+```
+vim.b.slime_target_config = "slime_neovim#config"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function that configures which terminal text is sent to. Here we set it to the configuration function defined in this plugin.
+
+
+---
+
+
+```
+vim.b.slime_target_send = "slime_neovim#send"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function that actually sends text to the terminal. We set it to the function defined in this plugin.
+
+
+---
+
+```
+vim.b.slime_valid_env = "slime_neovim#valid_env"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function checks if the environment contains a valid target. For Neovim this in practice checks if a terminal is open.
+
+---
+
+```
+vim.b.slime_valid_config = "slime_neovim#valid_config"
+```
+
+(defined in `vim-slime-ext-plugins`) This variable holds the function checks if a configuration is valid.
+
+---
 ### Mappings
 
 See the Usage and Example Installation sections for available commands, functions and mapping examples.

@@ -35,7 +35,7 @@ endfunction
 
 
 "evaluates whether ther is a terminal running; if there isn't then no config can be valid
-function! slime_neovim#validate_env(config) abort
+function! slime_neovim#valid_env(config) abort
 	if slime_neovim#NotExistsLastChannel()
 		echo "Terminal not detected: Open a neovim terminal and try again. "
 		return 0
@@ -45,7 +45,12 @@ endfunction
 
 " "checks that a configuration is valid
 " returns boolean of whether the supplied config is valid
-function! slime_neovim#validate_config(config) abort
+function! slime_neovim#valid_config(config) abort
+
+	if slime_neovim#NotExistsLastChannel()
+		echo "Terminal not detected: Open a neovim terminal and try again. "
+		return 0
+	endif
 
 	if !exists("a:config") ||  a:config == v:null
 		echo "Config does not exist."
