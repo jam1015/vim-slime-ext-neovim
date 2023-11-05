@@ -95,6 +95,7 @@ For this plugin (`vim-slime-ext-neovim`) if you try to send text to a terminal w
 
 ### Available Ex Commands
 
+
 - `:SlimeConfig` configures the current buffer to select a terminal.
 - `<range>SlimeSend` send the range of lines to the terminal. For example to send lines three through five to the terminal, `:3,5SlimeSend`.
 
