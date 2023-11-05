@@ -110,10 +110,10 @@ Vimscript configuration is also possible:
 
 
 That plugin defines the variables
-- |g:slime_target_send`| 
-- |g:slime_target_config`| 
-- |g:slime_valid_config`| and 
-- |g:slime_valid_env| 
+|g:slime_target_send| 
+|g:slime_target_config| 
+|g:slime_valid_config| and 
+|g:slime_valid_env| 
 
 We set them to the proper functions defined to allow sending text to a neovim
 terminal, configuration of which terminal to send, and validation of the
@@ -160,7 +160,7 @@ opened terminal, but can seledt any.
 ==============================================================================
 GLOBAL AND LOCAL VARIABLES             *vim-slime-ext-neovim-global-variables*
 
-Buffer local values (starting with "b:") take precedence over global balues
+Buffer local values (starting with "b:") take precedence over global values
 starting with ("g:").
 
 |g:slime_target_config| |b:slime_target_config|
@@ -183,7 +183,7 @@ starting with ("g:").
 
 *g:slime_valid_config* *b:slime_valid_config*
 
-Speclfies function that is used to ensure that a configuration is valid.
+Specifies function that is used to ensure that a configuration is valid.
 
 >vim
 	let g:slime_valid_config = slime_neovim#valid_config
@@ -211,7 +211,7 @@ defaults.
 
 *g:slime_input_pid*
 
-When set to 0, use |job-id| instead of system PID to selecct a terminal.
+When set to 0, use |job-id| instead of system PID to select a terminal.
 
 >vim
 	let g:slime_input_pid = 0
