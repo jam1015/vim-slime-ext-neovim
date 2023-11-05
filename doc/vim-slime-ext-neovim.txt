@@ -166,7 +166,7 @@ starting with ("g:").
 |g:slime_target_config| |b:slime_target_config|
 
 	Specifies the function used for configuring the target terminal.  Set to
-	*slim_neovim#config* to use this plugin.
+	*slime_neovim#config* to use this plugin.
 
 >vim
 	 let g:slime_valid_env = "slime_neovim#config"
@@ -175,7 +175,7 @@ starting with ("g:").
 |g:slime_target_send| |b:slime_target_send|
 
 	Specifies the function used for sending text to the terminal. Set to
-	*slim_neovim#send* to use this plugin.
+	*slime_neovim#send* to use this plugin.
 
 >vim
 	let g:slime_target_send = "slime_neovim#send" 
@@ -184,7 +184,7 @@ starting with ("g:").
 *g:slime_valid_config* *b:slime_valid_config*
 
 Specifies function that is used to ensure that a configuration is valid.
-
+Set to *slime_neovim#valid_config* to use this plugin.
 >vim
 	let g:slime_valid_config = slime_neovim#valid_config
 <
@@ -193,7 +193,7 @@ Specifies function that is used to ensure that a configuration is valid.
 
 Specifies the function used to make sure that then environment is valid.
 For Neovim that means that  there is a Neovim terminal running.  Set to
-*slim_neovim#config* to use this plugin.
+*slime_neovim#valid_env* to use this plugin.
 
 >vim
 	 let g:slime_valid_env = "slime_neovim#valid_env"
