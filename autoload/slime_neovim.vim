@@ -2,6 +2,7 @@
 
 function! slime_neovim#config(config, ...) abort
 	" Check if function is called internally or by external plugins, likely vim-slime-ext-plugins
+	echom "inside the neovim config"
 
 	let config_in = a:config
 	if empty(config_in)
@@ -9,8 +10,12 @@ function! slime_neovim#config(config, ...) abort
 		let last_pid = get(get(g:slime_last_channel, -1, {}), 'pid', '')
 		let last_job = get(get(g:slime_last_channel, -1, {}), 'jobid', '')
 		let config_in = {"neovim": {"jobid":  last_job, "pid": last_pid }}
+
 	endif
 
+	echom "echoing config contents"
+	echom config_in["neovim"]["jobid"]
+	echom config_in["neovim"]["pid"]
 
 
 	" Get the jobid based on the configuration provided
@@ -21,6 +26,7 @@ function! slime_neovim#config(config, ...) abort
 		if exists("g:slime_get_jobid")
 			let id_in = g:slime_get_jobid()
 		else
+			echom "getting the id"
 			let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
 			let id_in = str2nr(id_in)
 		endif
@@ -30,14 +36,18 @@ function! slime_neovim#config(config, ...) abort
 	let config_in["neovim"]["jobid"] = id_in
 	let config_in["neovim"]["pid"] = pid_in
 
+	echom "echoing final config contents"
+	echom config_in["neovim"]["jobid"]
+	echom config_in["neovim"]["pid"]
+
 	return config_in
 endfunction
 
 
 "evaluates whether ther is a terminal running; if there isn't then no config can be valid
-function! slime_neovim#valid_env(config) abort
+function! slime_neovim#valid_env() abort
 	if slime_neovim#NotExistsLastChannel()
-		echo "Terminal not detected: Open a neovim terminal and try again. "
+		echo "Terminal not detected: Open a Neovim terminal and try again. "
 		return 0
 	endif
 	return 1
@@ -46,41 +56,50 @@ endfunction
 " "checks that a configuration is valid
 " returns boolean of whether the supplied config is valid
 function! slime_neovim#valid_config(config) abort
+	echom "inside the neovim validation function"
 
+	echom "checking last channel"
 	if slime_neovim#NotExistsLastChannel()
-		echo "Terminal not detected: Open a neovim terminal and try again. "
+		echom "Terminal not detected: Open a neovim terminal and try again. "
 		return 0
 	endif
 
-	if !exists("a:config") ||  a:config == v:null
-		echo "Config does not exist."
+	echom "checking if the config exists"
+	if !exists("a:config") ||  a:config is v:null
+		echom "Config does not exist."
 		return 0
 	endif
 
+	echom "checcking datatype of config"
 	" Ensure the config is a dictionary and a previous channel exists
 	if type(a:config) != v:t_dict 
-		echo "Config type not valid."
+		echom "Config type not valid."
 		return 0
 	endif
 
+	echom "making sure the config is not empty"
 	if empty(a:config)
-		echo "Config is empty."
+		echom "Config is empty."
 		return 0
 	endif
 
 	" Ensure the correct keys exist within the configuration
+
+	echom "making sure the config has right fields"
 	if !(has_key(a:config, 'neovim') && has_key(a:config['neovim'], 'jobid') )
-		echo "Improper configuration structure Try again"
+		echom "Improper configuration structure Try again"
 		return 0
 	endif
 
+	echom "making sure that there was an id found"
 	if a:config["neovim"]["jobid"] == -1  "the id wasn't found translate_pid_to_id
-		echo "No matching job id for the provided pid. Try again"
+		echom "No matching job id for the provided pid. Try again"
 		return 0
 	endif
 
-	if index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0
-		throw "Job ID not found. Try again."
+	echom "trying to find jobid inside the last_channel variable"
+	if !(index( slime_neovim#channel_to_array(g:slime_last_channel), a:config['neovim']['jobid']) >= 0)
+		echom "Job ID not found. Try again."
 		return 0
 	endif
 
