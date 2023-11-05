@@ -239,9 +239,10 @@ When set to 0, use |job-id| instead of system PID to selecct a terminal.
 <
 
 ==============================================================================
-MAPPINGS                                                   *vim-slime-ext-neovim-mappings*
+MAPPINGS                                       *vim-slime-ext-neovim-mappings*
 
-See  |vim-slime-ext-neovim-usage| and |vim-slime-ext-neovim-installation| for available commands, functions and mapping examples.
+See  |vim-slime-ext-neovim-usage| and |vim-slime-ext-neovim-installation| for
+available commands, functions and mapping examples.
 
 
  vim:tw=78:ts=8:noet:ft=help:norl:
