@@ -38,7 +38,13 @@ next line to the REPL. This works for any program in the terminal accepting
 text input.
 
 ==============================================================================
-INSTALLATION                               *vim-slime-ext-neovim-installation*
+INSTALLATION/CONFIGURATION                 *vim-slime-ext-neovim-installation*
+                                          *vim-slime-ext-neovim-configuration*
+
+Global variables (`vim.g.xxx`) need to be created and set by the user. 
+By default, they do not exist, which has the same effect as their being `false`.
+
+Global variables are described in the next section.
 
 Note: vim-slime-ext-plugins is a required dependency.
 
@@ -149,14 +155,6 @@ Additional commands:
 If you try to send text when no terminal is opened, you'll be prompted to open
 one. If multiple terminals are open, you're prompted with the most recently
 opened terminal, but can seledt any.
-
-==============================================================================
-CONFIGURATION                             *vim-slime-ext-neovim-configuration*
-
-Global variables (`vim.g.xxx`) need to be created and set by the user. 
-By default, they do not exist, which has the same effect as their being `false`.
-
-Global variables are described in the next section.
 
 
 ==============================================================================
