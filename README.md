@@ -30,7 +30,7 @@ init = function()
     -- -- these next four functions are essential. they could be wrapped in an `ini` function but
        -- I leave them here for the user to set explicitly
 
-	-- tow necessary functions that tell the vim-slime-ext-plugins how to configure, and how to send text
+	-- two necessary functions that tell the vim-slime-ext-plugins how to configure, and how to send text
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
 	-- two necessary functions that help make sure your configuration and environment are correct
