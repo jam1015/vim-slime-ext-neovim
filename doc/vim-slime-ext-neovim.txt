@@ -55,11 +55,9 @@ Example installation and configuration using |lazy.nvim|:
 	'Klafyvel/vim-slime-ext-neovim',
 	dependencies = { "jpalardy/vim-slime-ext-plugins" },
 	init = function()
-		-- required vim-slime-ext-plugins to use the functions from this plugin
+		--required: tell vim-slime-ext-plugins to use the functions from this plugin
 		vim.g.slime_target_send = "slime_neovim#send"
 		vim.g.slime_target_config = "slime_neovim#config"
-
-		-- two optional functions
 		-- checks if at least one Neovim terminal is running
 		vim.g.slime_valid_env = "slime_neovim#valid_env" 
 		-- checks if the configuration is correct

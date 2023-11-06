@@ -30,10 +30,10 @@ init = function()
     -- -- these next four functions are essential. they could be wrapped in an `ini` function but
        -- I leave them here for the user to set explicitly
 
-	-- these next two are essential, telling vim-slime-ext-plugins to use the functions from this plugin
+	-- tow necessary functions that tell the vim-slime-ext-plugins how to configure, and how to send text
 	vim.g.slime_target_send = "slime_neovim#send"
 	vim.g.slime_target_config = "slime_neovim#config"
-	-- two functions that help make sure your configuration and environment are correct
+	-- two necessary functions that help make sure your configuration and environment are correct
 	vim.g.slime_valid_env = "slime_neovim#valid_env"  -- checks if at least one Neovim terminal is running
 	vim.g.slime_valid_config = "slime_neovim#valid_config" -- checks if the configuration is correct
 

@@ -19,7 +19,7 @@ function! slime_neovim#config(config, ...) abort
 
 
 	" Get the jobid based on the configuration provided
-	if get(g:, "slime_input_pid", 0)
+	if exists("g:slime_input_pid") && g:slime_input_pid
 		let pid_in = input("pid: ", str2nr(jobpid(config_in["neovim"]["jobid"])))
 		let id_in = slime_neovim#translate_pid_to_id(pid_in)
 	else
@@ -30,7 +30,7 @@ function! slime_neovim#config(config, ...) abort
 			let id_in = input("jobid: ", str2nr(config_in["neovim"]["jobid"]))
 			let id_in = str2nr(id_in)
 		endif
-		let pid_in = jobpid(id_in)
+		let pid_in = slime_neovim#translate_id_to_pid(id_in)
 	endif
 
 	let config_in["neovim"]["jobid"] = id_in
@@ -58,11 +58,11 @@ endfunction
 function! slime_neovim#valid_config(config) abort
 	echom "inside the neovim validation function"
 
-	echom "checking last channel"
-	if slime_neovim#NotExistsLastChannel()
-		echom "Terminal not detected: Open a neovim terminal and try again. "
-		return 0
-	endif
+"	echom "checking last channel"
+"	if slime_neovim#NotExistsLastChannel()
+"		echom "Terminal not detected: Open a neovim terminal and try again. "
+"		return 0
+"	endif
 
 	echom "checking if the config exists"
 	if !exists("a:config") ||  a:config is v:null
@@ -148,6 +148,16 @@ function! slime_neovim#translate_pid_to_id(pid)
 		endif
 	endfor
 	return -1
+endfunction
+
+function! slime_neovim#translate_id_to_pid(id)
+	let pid_out = -1
+	try
+		let pid_out = jobpid(a:id)
+	catch /E900: Invalid channel id/
+		let pid_out = -1
+	endtry
+	return pid_out
 endfunction
 
 " Checks if a previous channel does not exist or is empty.
